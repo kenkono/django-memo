@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
 from .models import Memo
 from django.shortcuts import get_object_or_404
-from .forms import MemoForm
+from .forms import MemoForm, LoginForm
 from django.views.decorators.http import require_POST
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
+from django.views import generic
 
 def index(request):
     memos = Memo.objects.all().order_by('-updated_datetime')
@@ -42,6 +45,17 @@ def edit_memo(request, memo_id):
     else:
         form = MemoForm(instance=memo)
     return render(request, 'app/edit_memo.html', {'form': form, 'memo': memo})
+
+
+class Login(LoginView):
+    """ログインページ"""
+    form_class = LoginForm
+    template_name = 'app/login.html'
+
+
+class Logout(LoginRequiredMixin, LogoutView):
+    """ログアウトページ"""
+    template_name = 'app/top.html'
 
 
 
